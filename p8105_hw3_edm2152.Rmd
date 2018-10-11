@@ -93,15 +93,29 @@ Instacart Data Import
 ```{r}
 instacart_data = instacart %>% 
   janitor::clean_names()
+  
+unique_users = instacart_data %>% 
+  distinct(user_id) %>% 
+  nrow()
+
+distinct_dept = instacart_data %>% 
+  distinct(department) %>% 
+  nrow()
+
+distinct_products = instacart_data %>% 
+  distinct(product_id) %>% 
+  nrow()
 ```
 
-To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. 
-
+In the instacart dataset there are `r ncol(instacart)` variables including identifiers for aisle, order, product and customer. The instacart dataset also includes `r nrow(instacart)` observations which is equivalent to a product from an order. There are `r unique_users` unique users in the dataset that submitted an order, `r distinct_dept` distinct departments that recieved an order, and `r distinct_products` distinct products ordered. 
 
 
 * How many aisles are there, and which aisles are the most items ordered from?
 
 ```{r aisles}
+
+
+
 
 ```
 
