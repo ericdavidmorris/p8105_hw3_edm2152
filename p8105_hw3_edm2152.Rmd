@@ -48,6 +48,7 @@ Make a “spaghetti plot” that shows the number of observations in each state 
 
 ```{r spaghetti}
 brfss_data %>% 
+  distinct(state, county, year) %>% 
   group_by(state, year) %>% 
   summarize(n_locations = n()) %>% 
   ggplot(aes(x = year, y = n_locations, color = state)) + 
@@ -155,7 +156,13 @@ instacart_data %>%
 * Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
 
 ```{r popular table}
-
+instacart_data %>% 
+  filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>% 
+  group_by(aisle, product_name) %>% 
+  summarize(number_items = n()) %>% 
+  top_n(5, number_items) %>% 
+  arrange(desc(number_items)) %>% 
+  knitr::kable()
 ```
 
 
