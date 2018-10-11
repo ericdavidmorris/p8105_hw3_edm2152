@@ -107,19 +107,40 @@ distinct_products = instacart_data %>%
   nrow()
 ```
 
-In the instacart dataset there are `r ncol(instacart)` variables including identifiers for aisle, order, product and customer. The instacart dataset also includes `r nrow(instacart)` observations which is equivalent to a product from an order. There are `r unique_users` unique users in the dataset that submitted an order, `r distinct_dept` distinct departments that recieved an order, and `r distinct_products` distinct products ordered. 
+In the instacart dataset there are `r ncol(instacart)` variables which include identifiers for aisle, order, product and customer along with a corresponding numerical ID in some cases (aisle and product for example). The instacart dataset also includes `r nrow(instacart)` observations which is equivalent to a product from an order. There are `r unique_users` unique users in the dataset that submitted an order, `r distinct_dept` distinct departments that recieved an order, and `r distinct_products` distinct products ordered. 
 
 
 * How many aisles are there, and which aisles are the most items ordered from?
 
 ```{r aisles}
+distinct_aisles = 
+  instacart_data %>% 
+  distinct(aisle_id) %>% 
+  nrow()
 
-
-
-
+instacart_data %>% 
+  group_by(aisle_id, aisle) %>% 
+  summarize(most_aisles = n()) %>% 
+  ungroup() %>% 
+  top_n(5, most_aisles) %>% 
+  arrange(desc(most_aisles)) %>% 
+  knitr::kable()
 ```
 
-* Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
+There are `r distinct_aisles` distinct aisles in the dataset and the top five aisles with the most items ordered from are: 
+
+* Fresh Vegetables (150,609 items ordered)
+
+* Fresh Fruits (150,473 items ordered)
+
+* Packaged Vegetables & Fruits (78,493 items ordered)
+
+* Yogurt (55,240 items ordered)
+
+* Packaged Cheese (41,699 items ordered)
+
+
+Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
 
 ```{r items plot}
 
