@@ -110,8 +110,6 @@ distinct_products = instacart_data %>%
 In the instacart dataset there are `r ncol(instacart)` variables which include identifiers for aisle, order, product and customer along with a corresponding numerical ID in some cases (aisle and product for example). The instacart dataset also includes `r nrow(instacart)` observations which is equivalent to a product from an order. There are `r unique_users` unique users in the dataset that submitted an order, `r distinct_dept` distinct departments that recieved an order, and `r distinct_products` distinct products ordered. 
 
 
-* How many aisles are there, and which aisles are the most items ordered from?
-
 ```{r aisles}
 distinct_aisles = 
   instacart_data %>% 
@@ -143,7 +141,14 @@ There are `r distinct_aisles` distinct aisles in the dataset and the top five ai
 Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
 
 ```{r items plot}
-
+instacart_data %>% 
+  group_by(aisle_id, aisle) %>% 
+  summarize(number_items = n()) %>% 
+  arrange(desc(number_items)) %>% 
+  ggplot(aes(x = reorder(aisle, -number_items), y = number_items, fill = aisle)) +
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 50, hjust = 1, size = 8),
+        legend.position = "none")
 ```
 
 
