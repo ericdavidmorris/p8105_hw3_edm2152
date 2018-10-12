@@ -12,6 +12,7 @@ library(tidyverse)
 
 # install.packages("devtools")
 devtools::install_github("p8105/p8105.datasets")
+
 ```
 
 
@@ -108,7 +109,7 @@ distinct_products = instacart_data %>%
   nrow()
 ```
 
-In the instacart dataset there are `r ncol(instacart)` variables which include identifiers for aisle, order, product and customer along with a corresponding numerical ID in some cases (aisle and product for example). The instacart dataset also includes `r nrow(instacart)` observations which is equivalent to a product from an order. There are `r unique_users` unique users in the dataset that submitted an order, `r distinct_dept` distinct departments that recieved an order, and `r distinct_products` distinct products ordered. 
+In the instacart dataset there are `r ncol(instacart_data)` variables which include identifiers for aisle, order, product and customer along with a corresponding numerical ID in some cases (aisle and product for example). The instacart dataset also includes `r nrow(instacart_data)` observations which is equivalent to a product from an order. There are `r unique_users` unique users in the dataset that submitted an order, `r distinct_dept` distinct departments that recieved an order, and `r distinct_products` distinct products ordered. 
 
 
 ```{r aisles}
@@ -184,4 +185,33 @@ instacart_data %>%
 
 ## Problem 3
 
+Loading in NY NOAA Data
 
+```{r noaa data import}
+ny_noaa_data = ny_noaa %>% 
+  janitor::clean_names()
+
+
+```
+
+In the NY NOAA dataset there are `r ncol(ny_noaa_data)` variables which includes a character weather station ID, date of observation, and variables for precipitation observed, snowfall, snow depth, and temperature maximum and minimums. The dataset includes `r nrow(ny_noaa_data)` observations (one observation for each day starting on January 1st, 1981 and ending on December 31st, 2010). 
+
+
+Temp was 10th of degree and precipitation is in tenths of mmm.
+
+Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
+
+```{r}
+ny_noaa_data %>% 
+  separate(date, c("year", "month", "day"), sep = "-") %>% 
+  mutate(tmax = as.numeric(tmax),
+         tmin = as.numeric(tmin),
+         prcp = prcp,
+         month = month.name[],
+         year = as.integer(year))
+```
+
+
+Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
+Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
