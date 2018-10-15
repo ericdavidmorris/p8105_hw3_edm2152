@@ -14,6 +14,11 @@ library(ggridges)
 library(viridis)
 library(patchwork)
 
+knitr::opts_chunk$set(
+  fig.width = 6, 
+  fig.asp = .8, 
+  out.width = "90%")
+
 # install.packages("devtools")
 devtools::install_github("p8105/p8105.datasets")
 
@@ -151,7 +156,8 @@ instacart_data %>%
   group_by(aisle_id, aisle) %>% 
   summarize(number_items = n()) %>% 
   arrange(desc(number_items)) %>% 
-  ggplot(aes(x = reorder(aisle, -number_items), y = number_items, fill = aisle)) +
+  ggplot(aes(x = reorder(aisle, number_items), y = number_items, fill = aisle)) +
+  coord_flip()+
   geom_col() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
         legend.position = "none")
