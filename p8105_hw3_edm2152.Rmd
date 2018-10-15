@@ -271,7 +271,7 @@ temp_plot =
   ggplot(aes(x = tmin, y = tmax)) +
   geom_hex() +
   viridis::scale_fill_viridis() +
-  labs(title = "NY Daily Minimum and Maximum Temperature (°C) 1981-2010",
+  labs(title = "NY Minimum and Maximum Temperature (°C) 1981-2010",
        x = "Minimum Temperature (°C)",
        y = "Maximum Temperature (°C)",
        caption = "Data from the rnoaa package") +
@@ -299,6 +299,6 @@ snowfall_plot =
   theme(plot.title = element_text(size = 7),
         legend.position = "none")
 
-temp_plot + snowfall_plot
+snowfall_plot + temp_plot
 ```
 
