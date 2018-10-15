@@ -187,31 +187,46 @@ instacart_data %>%
 
 Loading in NY NOAA Data
 
-```{r noaa data import}
+```{r noaa data import and cleaning}
 ny_noaa_data = ny_noaa %>% 
-  janitor::clean_names()
-
-
+  janitor::clean_names() %>% 
+  separate(date, c("year", "month", "day"), sep = "-") %>% 
+  mutate(tmax = as.numeric(tmax) / 10,
+         tmin = as.numeric(tmin) / 10,
+         prcp = prcp /10,
+         month = month.name[as.integer(month)], 
+         year = as.integer(year))
 ```
 
 In the NY NOAA dataset there are `r ncol(ny_noaa_data)` variables which includes a character weather station ID, date of observation, and variables for precipitation observed, snowfall, snow depth, and temperature maximum and minimums. The dataset includes `r nrow(ny_noaa_data)` observations (one observation for each day starting on January 1st, 1981 and ending on December 31st, 2010). 
 
 
+
 Temp was 10th of degree and precipitation is in tenths of mmm.
 
-Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
+
 
 ```{r}
 ny_noaa_data %>% 
-  separate(date, c("year", "month", "day"), sep = "-") %>% 
-  mutate(tmax = as.numeric(tmax),
-         tmin = as.numeric(tmin),
-         prcp = prcp,
-         month = month.name[],
-         year = as.integer(year))
+  group_by(snow) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
 ```
+
+
+The most commonly observed values for snowfall are 0 and NA, which makes sense as most days during the year there is no snowfall. This is shown when we calculate the median value for snowfall, which is `r median(ny_noaa_data$snow, na.rm = TRUE)` mm. However, the average amount of snowfall is `r round(mean(ny_noaa_data$snow, na.rm = TRUE), 4)` mm (after stripping the NA variables).
 
 
 Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
 
+```{r}
+
+```
+
+
 Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+```{r}
+
+```
+
