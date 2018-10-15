@@ -9,6 +9,10 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(hexbin)
+library(ggridges)
+library(viridis)
+library(patchwork)
 
 # install.packages("devtools")
 devtools::install_github("p8105/p8105.datasets")
@@ -149,7 +153,7 @@ instacart_data %>%
   arrange(desc(number_items)) %>% 
   ggplot(aes(x = reorder(aisle, -number_items), y = number_items, fill = aisle)) +
   geom_col() +
-  theme(axis.text.x = element_text(angle = 50, hjust = 1, size = 8),
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
         legend.position = "none")
 ```
 
@@ -194,8 +198,8 @@ ny_noaa_data = ny_noaa %>%
   mutate(tmax = as.numeric(tmax) / 10,
          tmin = as.numeric(tmin) / 10,
          prcp = prcp /10,
-         month = month.name[as.integer(month)], 
-         year = as.integer(year))
+         month = month.name[as.integer(month)],
+         year = as.numeric(year))
 ```
 
 In the NY NOAA dataset there are `r ncol(ny_noaa_data)` variables which includes a character weather station ID, date of observation, and variables for precipitation observed, snowfall, snow depth, and temperature maximum and minimums. The dataset includes `r nrow(ny_noaa_data)` observations (one observation for each day starting on January 1st, 1981 and ending on December 31st, 2010). 
@@ -217,16 +221,67 @@ ny_noaa_data %>%
 The most commonly observed values for snowfall are 0 and NA, which makes sense as most days during the year there is no snowfall. This is shown when we calculate the median value for snowfall, which is `r median(ny_noaa_data$snow, na.rm = TRUE)` mm. However, the average amount of snowfall is `r round(mean(ny_noaa_data$snow, na.rm = TRUE), 4)` mm (after stripping the NA variables).
 
 
-Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+The two-panel plot below shows the average maximum temperature in January and July from 1981-2010. The average max temperature in Jaunary ranges from near -5°C to 5°C and centering around 0°C. The average max temperature for July ranges from around 25°C to a little below 30°C, centering around 26°C. The average max temperature has more peaks and valleys in January, suggesting more temperature fluctuation year to year in the winter. 
 
 ```{r}
-
+ny_noaa_data %>% 
+  filter(month %in% c("January", "July") ) %>% 
+  group_by(year, month) %>% 
+  summarize(mean_max_temp = mean(tmax, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = mean_max_temp)) +
+  geom_line() +
+  facet_grid(~month) +
+  labs(title = "Mean Maximum Temperature (°C) in January and July (1981-2010)",
+       x = "Year",
+       y = "Mean Max Temperature (°C)",
+       caption = "Data from the rnoaa package") +
+  scale_y_continuous(breaks = c(-5, 0, 5, 10, 15, 20, 25, 30), 
+                     labels = c("-5°", "0°", "5°", "10°", "15°", "20°", "25°", "30°")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5))
 ```
 
+Two-panel plot of:
 
-Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+* Daily Minimum and Maximum Temperature for the full dataset
+* Distribution of snowfall for the full dataset 
 
 ```{r}
+temp_plot = 
+  ny_noaa_data %>% 
+  filter(!is.na(tmax),
+         !is.na(tmin)) %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() +
+  viridis::scale_fill_viridis() +
+  labs(title = "Hexagon Plot of Daily Minimum and Maximum Temperature (°C) from 1981-2010 in New York",
+       x = "Minimum Temperature (°C)",
+       y = "Maximum Temperature (°C)",
+       caption = "Data from the rnoaa package") +
+  scale_x_continuous(breaks = c(-60, -45, -30, -15, 0, 15, 30, 45, 60), 
+                     labels = c("-60°", "-45°", "-30°", "-15°", "0°", "15°", "30°", "45°", "60°")) +
+  scale_y_continuous(breaks = c(-60, -45, -30, -15, 0, 15, 30, 45, 60), 
+                     labels = c("-60°", "-45°", "-30°", "-15°", "0°", "15°", "30°", "45°", "60°")) +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "bottom",
+        legend.text = element_text(angle = 45, hjust = 1))
+ 
 
+snowfall_plot = 
+  ny_noaa_data %>% 
+  filter(snow > 0 & snow < 100) %>% 
+  mutate(year_char = as.character(year)) %>% 
+  ggplot(aes(x = snow, y = year_char, fill = year_char)) +
+  ggridges::geom_density_ridges(alpha = 0.75) + 
+  labs(title = "Density Plot of Snowfall (mm) Distribution in New York",
+       x = "Snowfall in mm",
+       y = "Year",
+       caption = "Data from the rnoaa package") + 
+  scale_x_continuous(breaks = c(0, 20, 40, 60, 80, 100), 
+                   labels = c("0", "20", "40", "60", "80", "100")) +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "none")
+
+temp_plot + snowfall_plot
 ```
 
